@@ -52,9 +52,11 @@ trues = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "training_labels.pkl"
 
 with st.sidebar:
     st.session_state["max_duration"] = st.number_input("Max duration in seconds", value=60, step=10, max_value=600)
-    st.session_state["slice_duration"] = st.number_input("Duration of slices", value=2.0, step=0.5, max_value=10.0)
-    st.session_state["overlap"] = st.slider("Overlap", value=0.5, step=0.05, max_value=1.0)
     st.info("Maximum duration (in seconds) that the model will process.")
+    st.session_state["slice_duration"] = st.number_input("Duration of slices", value=2.0, step=0.5, max_value=10.0)
+    st.info("Duration of each individual slice extracted from the audio.")
+    st.session_state["overlap"] = st.slider("Overlap", value=0.5, step=0.05, max_value=1.0)
+    st.info("The fraction of overlap between each contigous slice.")
 
 
 # --- PAGE START ---
