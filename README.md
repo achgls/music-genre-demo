@@ -8,8 +8,9 @@ for music genre classification as part of the Numerical Analysis for Machine Lea
 
 Usage
 -----
-The demo consists of a streamlit app that allows you to upload an audio file
-or paste a YouTube URL for the model to infer the music genre.
+The demo consists of a streamlit app that allows you to upload a local audio file
+(with supported formats those of `torchaudio.load(...)`)
+or paste a **YouTube** URL for the model to infer the music genre.
 
 Once you input an audio, you will be able to hear it back and observe
 its spectrogram representation.
@@ -20,7 +21,15 @@ The model will then run inference on the given audio. The stacked chart represen
 the probabilities of each genre across time. The overall scores for the top-5 genres
 are displayed.
 Lastly, an interactive representation of the model's *latent space* is displayed. After
-completion of inference, the *walk* of the given song in that feature space will be displayed
+completion of inference, the representation of the given song in that feature space will be displayed
 as black dots.
 
 ![inference](images/inference.jpg)
+
+
+Requirements
+------------
+In addition to the libraries listed in `requirements.txt`, you will need to have `FFmpeg`
+installed on your machine with the CLI commands accessible from the environment where the 
+app will run. This might require you to copy the `ffmpeg.exe` and `ffprobe.exe` executables
+in the directory where your python environment's `python.exe` is located.
