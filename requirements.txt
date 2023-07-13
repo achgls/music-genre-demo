@@ -1,0 +1,10 @@
+matplotlib
+numpy
+plotly
+pytube
+scikit-learn
+seaborn
+streamlit
+torch
+torchaudio
+ffmpeg-python
