@@ -1,12 +1,12 @@
 {
   "config_file": null,
-  "data_dir": "./res/audio_data",
+  "data_dir": "/kaggle/input/gtzan-music-genre/audio_data",
   "contaminated": false,
   "slice_length": 3.0,
   "device": "auto",
   "num_fold": 4,
-  "out_path": "/content/gdrive/MyDrive/music-genre-classification",
-  "run_tag": "GAP",
+  "out_path": "/kaggle/working/results",
+  "run_tag": "GAP-data-aug-0",
   "cp_freq": 5,
   "model_path": null,
   "num_epochs": 50,
@@ -24,6 +24,6 @@
   "scheduler_kwargs": "{\"total_iters\":50,\"start_factor\":1.0,\"end_factor\":0.1}",
   "feature": "powerspec",
   "feature_kwargs": null,
-  "spec_aug": null,
-  "wav_aug": null
+  "spec_aug": "{\"max_freq_mask_len\":140,\"max_time_mask_len\":30,\"max_time_mask_frac\":0.25}",
+  "wav_aug": "{\"white_noise_range\":[16, 36],\"gain_db_range\":[-14, 14]}"
 }
