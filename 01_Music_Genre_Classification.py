@@ -50,6 +50,13 @@ pca = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "PCA.pkl"))
 scaler = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "StdScaler.pkl"))
 trues = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "training_labels.pkl"))
 
+with st.sidebar:
+    st.session_state["max_duration"] = st.number_input("Max duration in seconds", value=60, step=10, max_value=600)
+    st.session_state["slice_duration"] = st.number_input("Duration of slices", value=2.0, step=0.5, max_value=10.0)
+    st.session_state["overlap"] = st.slider("Overlap", value=0.5, step=0.05, max_value=1.0)
+    st.info("Maximum duration (in seconds) that the model will process.")
+
+
 # --- PAGE START ---
 
 st.image("images/logo_polimi.png")
@@ -92,6 +99,7 @@ with right:
             st.error("Could not resolve the specified URL.")
         except Exception as err:
             st.error(f"**ERROR**: Encountered `{err.__class__.__name__}`")
+            raise err.with_traceback(err.__traceback__)
 
 # ------ IF AUDIO -------
 
@@ -110,7 +118,7 @@ if wav is not None:
 
     # --- Show a random ~10-sec section of the associated spectrogram ---
     spec = transform(wav).squeeze().numpy()
-    offset = np.random.randint(spec.shape[-1] - 1200)
+    offset = 0 if spec.shape[-1] <= 1200 else np.random.randint(spec.shape[-1] - 1200)
     spec = np.log1p(spec)[400::-1, offset:offset+1200]
     fig, ax = plt.subplots(figsize=(10, 3))
     plt.axis(False)
@@ -126,10 +134,10 @@ if wav is not None:
     # --- Slice up the audio into 4.0 sec extracts ---
     slices = utils.slice_audio(
         wav=wav,
-        slice_duration=4.0,
-        overlap=0.75,
+        slice_duration=st.session_state["slice_duration"],
+        overlap=st.session_state["overlap"],
         sample_rate=SAMPLE_RATE,
-        max_duration=60.0
+        max_duration=st.session_state["max_duration"]
     )
     print("NUM SLICES:", len(slices))
 
