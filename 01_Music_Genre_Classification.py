@@ -1,5 +1,6 @@
 import streamlit as st
 
+from pytube.exceptions import RegexMatchError
 import joblib
 
 import numpy as np
@@ -24,10 +25,10 @@ st.set_page_config(
 )
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-training_embeddings = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/training_embeddings.pkl")
-pca = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/PCA.pkl")
-scaler = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/StdScaler.pkl")
-trues = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/training_labels.pkl")
+training_embeddings = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/training_embeddings.pkl")
+pca = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/PCA.pkl")
+scaler = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/StdScaler.pkl")
+trues = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/training_labels.pkl")
 
 genre_dict = {
     0: "Blues",
@@ -69,20 +70,37 @@ st.markdown("")
 left, right = st.columns((1, 3))
 with left:
     st.markdown("#### Upload a song extract for our model to classify")
+
+wav = None
+thumbnail_url = None
 with right:
     audio_file = st.file_uploader("uploader", label_visibility="collapsed")
+    url = st.text_input("Or paste a YouTube URL:")
+    if audio_file:
+        wav, sr = load(audio_file)
+        wav = Resample(orig_freq=sr, new_freq=SAMPLE_RATE)(wav)
+        print("wav_mean:", torch.mean(wav))
+    elif url:
+        try:
+            wav, sr = load(utils.get_audio_stream_from_youtube(url))
+        except RegexMatchError:
+            st.error("URL was not resolved")
 
-if audio_file:
+if thumbnail_url is not None:
+    st.image(thumbnail_url, use_column_width=True)
+
+
+if wav is not None:
     st.divider()
     st.markdown("")
+
     model, transform = utils.load_model_and_transform(MODEL_DIR, checkpoint="accuracy", model_type="CNN")
     model.eval()
-    wav, sr = load(audio_file)
 
     wav = wav[:1, :]
-    wav = Resample(orig_freq=sr, new_freq=SAMPLE_RATE)(wav)
 
-    st.audio(wav.numpy(), format="audio/wav", sample_rate=SAMPLE_RATE)
+    st.audio(wav.numpy(), sample_rate=SAMPLE_RATE)
+
     spec = transform(wav).squeeze().numpy()
     offset = np.random.randint(spec.shape[-1] - 1200)
     spec = np.log(spec+1)[400::-1, offset:offset+1200]
@@ -102,6 +120,7 @@ if audio_file:
         sample_rate=SAMPLE_RATE,
         max_duration=60.0
     )
+    print("NUM SLICES:", len(slices))
 
     palplot = sns.palplot(sns.color_palette("Set3", n_colors=10))
     plt.axis(False)
@@ -131,8 +150,8 @@ if audio_file:
             k: v for k, v in zip(genre_dict.values(), px.colors.qualitative.Set3)
         },
     )
+    training_feat_space.update_traces(marker_size=5)
     feature_figure.plotly_chart(training_feat_space, use_container_width=True)
-
 
     fig, ax = plt.subplots(figsize=(10, 3))
     ax.set_prop_cycle('color', sns.color_palette('Set3', 10))
@@ -181,10 +200,7 @@ if audio_file:
     )
     centroid = px.scatter_3d(
         x=[centroid[0]], y=[centroid[1]], z=[centroid[2]])
-    centroid.update_traces(marker_size=20, marker_line_width=3, marker_line_color="red", marker_color="black")
-    sample_feat_space.update_traces(line_color='#000000', line_width=3, marker_size=8)
+    centroid.update_traces(marker_size=15, marker_line_width=3, marker_line_color="red", marker_color="black")
+    sample_feat_space.update_traces(line_color='#000000', line_width=3, marker_size=7)
     feature_space = go.Figure(data=training_feat_space.data + sample_feat_space.data + centroid.data)
     feature_figure.plotly_chart(feature_space, use_container_width=True)
-
-
-
