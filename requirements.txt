@@ -8,3 +8,4 @@ streamlit
 torch
 torchaudio
 ffmpeg-python
+joblib

@@ -1,34 +1,31 @@
-import streamlit as st
+import os
 
-from pytube.exceptions import RegexMatchError
 import joblib
 
+import matplotlib.pyplot as plt
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+import seaborn as sns
+
+import streamlit as st
 
 import torch
+
+from pytube.exceptions import RegexMatchError
+
 from torchaudio import load
 from torchaudio.transforms import Resample
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.express as px
-import plotly.graph_objects as go
+from src import utils
 
 plt.set_cmap("Greys")
-
-
-from src import utils
 
 st.set_page_config(
     page_title="NAML - Music Genre Classifcation 🎼",
     page_icon="🎼"
 )
 st.set_option('deprecation.showPyplotGlobalUse', False)
-
-training_embeddings = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/training_embeddings.pkl")
-pca = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/PCA.pkl")
-scaler = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/StdScaler.pkl")
-trues = st.cache_data(joblib.load)("models/GAP-data-aug-0_fold4_20230710_215510/training_labels.pkl")
 
 genre_dict = {
     0: "Blues",
@@ -55,7 +52,12 @@ genre_dict_colab = {
     9: 'hiphop'}
 
 SAMPLE_RATE = 22_050
-MODEL_DIR = "models/GAP-data-aug-0_fold4_20230710_215510"
+MODEL_DIR = "models/SENet-GAP-w-Data-Aug"
+
+training_embeddings = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "training_embeddings.pkl"))
+pca = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "PCA.pkl"))
+scaler = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "StdScaler.pkl"))
+trues = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "training_labels.pkl"))
 
 st.image("images/logo_polimi.png")
 st.divider()
