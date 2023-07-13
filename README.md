@@ -29,6 +29,9 @@ as black dots.
 
 Requirements
 ------------
+```console
+pip install requirements.txt
+```
 In addition to the libraries listed in `requirements.txt`, you will need to have `FFmpeg`
 installed on your machine with the CLI commands accessible from the environment where the 
 app will run. This might require you to copy the `ffmpeg.exe` and `ffprobe.exe` executables
