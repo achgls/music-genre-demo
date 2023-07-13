@@ -24,10 +24,10 @@ st.set_page_config(
 )
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-training_embeddings = st.cache_data(joblib.load)("training_embeddings.pkl")
-pca = st.cache_data(joblib.load)("PCA.pkl")
-scaler = st.cache_data(joblib.load)("StdScaler.pkl")
-trues = st.cache_data(joblib.load)("training_labels.pkl")
+training_embeddings = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/training_embeddings.pkl")
+pca = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/PCA.pkl")
+scaler = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/StdScaler.pkl")
+trues = st.cache_data(joblib.load)("models/GAP_fold4_20230710_223121/training_labels.pkl")
 
 genre_dict = {
     0: "Blues",
