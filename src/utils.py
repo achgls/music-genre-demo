@@ -1,5 +1,6 @@
 import json
 import os.path
+import streamlit as st
 
 import torch
 
@@ -74,13 +75,45 @@ def slice_audio(
     num_frames = wav.size(-1)
     delta = num_frames - (offset + slice_frames)
 
+    max_offset = round(sample_rate * max_duration)
+
     slices = list()
-    while delta > 0:
+    while delta > 0 and offset < max_offset:
         delta = num_frames - (offset + slice_frames)
         if delta < 0:
-            slices.append(wav[offset:].repeat(2)[:slice_frames])
+            slices.append(wav[...,offset:].repeat(1, 2)[...,:slice_frames])
         else:
-            slices.append(wav[offset: offset+slice_frames])
+            slices.append(wav[...,offset: offset+slice_frames])
         offset += hop_frames
 
     return slices
+
+
+@st.cache_resource
+def load_model_and_transform(exp_dir: str, checkpoint: str = "accuracy", model_type: str = 'CNN'):
+    with open(os.path.join(exp_dir, "config.json"), 'r') as f:
+        config = json.load(f)
+    model_kwargs = parse_kwargs_arguments(config["model_kwargs"])
+    model: torch.nn.Module = get_model(model_name=model_type, num_classes=10, **model_kwargs)
+
+    feat_name = config["feature"]
+    feat_kwargs = parse_kwargs_arguments(config["feature_kwargs"])
+    transform = get_transform(feat_name, **feat_kwargs)
+
+    if checkpoint == "accuracy":
+        cp = os.path.join(exp_dir, "checkpoints", "best_acc_1.pt")
+    elif checkpoint == "loss":
+        cp = os.path.join(exp_dir, "checkpoints", "best_loss.pt")
+    else:
+        cp = os.path.join(exp_dir, "checkpoints", f"{checkpoint}.pt")
+
+    state_dict = torch.load(cp, map_location="cpu")
+    model.load_state_dict(state_dict)
+
+    return model, transform
+
+
+def get_activation(name, out):
+    def hook(model, input, output):
+        out[name] = output.detach()
+    return hook
