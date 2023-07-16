@@ -3,7 +3,7 @@ joblib
 numpy
 matplotlib
 ffmpeg-python
-pytube
+pytube3
 plotly
 scikit-learn
 seaborn
