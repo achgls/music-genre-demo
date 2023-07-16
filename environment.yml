@@ -12,5 +12,5 @@ dependencies:
     - pip:
         - torch==2.0.1
         - torchaudio==2.0.2
-        - ffmpeg-python=0.2.0
+        - ffmpeg-python==0.2.0
         - pytube==15.0.0
