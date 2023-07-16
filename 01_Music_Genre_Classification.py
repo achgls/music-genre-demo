@@ -87,17 +87,16 @@ with right:
         # Load a file using torchaudio backend
         # will only support specific file formats
         try:
-            new_audio_io, err = utils.ffmpeg_reencode_from_file(audio_file, target_ar=str(SAMPLE_RATE))
+            new_audio_io, err = utils.ffmpeg_reencode(audio_file, target_ar=str(SAMPLE_RATE), duration=st.session_state["max_duration"] )
             wav, sr = load(new_audio_io)
-            print("wav_mean:", torch.mean(wav))
         except RuntimeError:
-            st.error("There was an issue loading the file. The file format might not be supported by torchaudio"
-                     "backend. Please refer to"
+            st.error("There was an issue loading the file. The file format might not be supported by torchaudio "
+                     "backend. Please refer to "
                      "[torchaudio backend documentation](https://pytorch.org/audio/stable/backend.html).")
     elif url:
         try:
-            audio_io = utils.get_audio_stream_from_youtube(url)
-            wav, sr = load(audio_io)
+            yt_audio_io, err = utils.get_audio_stream_from_youtube(url)
+            wav, sr = load(yt_audio_io)
         except RegexMatchError:
             st.error("Could not resolve the specified URL.")
         except Exception as err:

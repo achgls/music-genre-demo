@@ -126,10 +126,13 @@ def get_activation(name, out):
     return hook
 
 
-def ffmpeg_reencode_from_file(f, target_ar: str = '22050'):
+def ffmpeg_reencode(f, target_ar: str = '22050', duration=None):
+    input_options = {"ac": 1}
+    if duration is not None:
+        input_options["t"] = duration
     audio_stream, err = (
         ffmpeg
-        .input(f, ac=1)
+        .input(f, **input_options)
         .output("pipe:", format='wav',
                 acodec='pcm_s16le',
                 ar=target_ar,
@@ -138,21 +141,6 @@ def ffmpeg_reencode_from_file(f, target_ar: str = '22050'):
     )
     audio_io = BytesIO(audio_stream)
     return audio_io, err
-
-
-def ffmpeg_reencode_from_buffer(f, target_ar: str = '22050'):
-    audio_stream, err = (
-        ffmpeg
-        .input(f, ac=1)
-        .output("pipe:", format='wav',
-                acodec='pcm_s16le',
-                ar=target_ar,
-                ac=1)  # Select WAV output format, and pcm_s16le auidio codec.
-        .run(capture_stdout=True)
-    )
-    audio_io = BytesIO(audio_stream)
-    return audio_io, err
-
 
 
 def wav_tensor_from_stream(s):
@@ -165,7 +153,7 @@ def wav_tensor_from_stream(s):
     return wav
 
 
-def get_audio_stream_from_youtube(url: str):
+def get_audio_stream_from_youtube(url: str, target_ar: str = '22050', duration=None):
     yt = YouTube(url)
 
     stream_url = yt.streams.filter(only_audio=True).first().url  # Get the URL of the video stream
@@ -178,9 +166,9 @@ def get_audio_stream_from_youtube(url: str):
     # Read audio into memory buffer.
     # Get the audio using stdout pipe of ffmpeg sub-process.
     # The audio is transcoded to PCM codec in WAC container.
-    audio_io, err = ffmpeg_reencode_from_file(stream_url, target_ar='22050')
+    audio_io, err = ffmpeg_reencode(stream_url, target_ar, duration)
 
-    return audio_io
+    return audio_io, err
 
 
 @st.cache_resource
