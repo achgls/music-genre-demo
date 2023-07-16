@@ -97,8 +97,18 @@ with right:
             raise err.with_traceback(err.__traceback__)
     elif url:
         try:
-            yt_audio_io, err = utils.get_audio_stream_from_youtube(url)
-            wav, sr = load(yt_audio_io)
+            down_file = utils.download_stream_from_youtube(url)
+            print("Downloaded YouTube audio stream to", down_file)
+            new_audio_io, err = utils.ffmpeg_reencode(down_file, duration=st.session_state["max_duration"])
+            wav, sr = load(new_audio_io)
+            try:
+                os.remove(down_file)
+            except FileNotFoundError:
+                print("Did not find", down_file, "to delete it.")
+            except Exception as err:
+                print(f"Encountered {err.__class__.__name__} when trying to delete {down_file}.")
+                print("Here's the traceback:")
+                print(err.__traceback__)
         except RegexMatchError:
             st.error("Could not resolve the specified URL.")
         except Exception as err:

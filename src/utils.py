@@ -153,10 +153,23 @@ def wav_tensor_from_stream(s):
     return wav
 
 
+def download_stream_from_youtube(url: str, out_path: str = "temp", shared_filename: str = "temporary_audio") -> str:
+    try:
+        os.mkdir(out_path)
+    except FileExistsError:
+        pass
+    yt = YouTube(url)
+    stream = yt.streams.filter(only_audio=True).first()
+    file_extension = stream.default_filename.split('.')[-1]
+    filename = f"{shared_filename}.{file_extension}"
+    complete_out_path = stream.download(output_path=out_path, filename=filename)
+    return complete_out_path
+
 def get_audio_stream_from_youtube(url: str, target_ar: str = '22050', duration=None):
     yt = YouTube(url)
 
     stream_url = yt.streams.filter(only_audio=True).first().url  # Get the URL of the video stream
+    print("Stream download URL:", stream_url)
 
     # Probe the audio streams (use it in case you need information like sample rate):
     # probe = ffmpeg.probe(stream_url)
