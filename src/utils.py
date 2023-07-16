@@ -7,6 +7,7 @@ import ffmpeg
 import streamlit as st
 
 import torch
+import yt_dlp
 from pytube import YouTube
 
 import plotly.express as px
@@ -158,12 +159,16 @@ def download_stream_from_youtube(url: str, out_path: str = "temp", shared_filena
         os.mkdir(out_path)
     except FileExistsError:
         pass
-    yt = YouTube(url)
-    stream = yt.streams.filter(only_audio=True).first()
-    file_extension = stream.default_filename.split('.')[-1]
-    filename = f"{shared_filename}.{file_extension}"
-    complete_out_path = stream.download(output_path=out_path, filename=filename)
-    return complete_out_path
+    ydl_opts = {
+        'format': 'm4a/bestaudio/best',
+        'paths': {"home": out_path}
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        error_code = ydl.download(url)
+
+    down_file = os.listdir(out_path)[0]
+    return os.path.join(out_path, down_file)
+
 
 def get_audio_stream_from_youtube(url: str, target_ar: str = '22050', duration=None):
     yt = YouTube(url)
