@@ -1,0 +1,11 @@
+streamlit
+joblib
+numpy
+matplotlib
+ffmpeg-python
+pytube
+plotly
+scikit-learn
+seaborn
+torch
+torchaudio
