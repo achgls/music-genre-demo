@@ -143,7 +143,7 @@ def ffmpeg_reencode_from_file(f, target_ar: str = '22050'):
 def ffmpeg_reencode_from_buffer(f, target_ar: str = '22050'):
     audio_stream, err = (
         ffmpeg
-        .input(f)
+        .input(f, ac=1)
         .output("pipe:", format='wav',
                 acodec='pcm_s16le',
                 ar=target_ar,
