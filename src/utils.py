@@ -171,6 +171,25 @@ def get_audio_stream_from_youtube(url: str, target_ar: str = '22050', duration=N
     return audio_io, err
 
 
+def ffmpeg_reencode_from_uploaded_file(file, target_ar: str = '22050', duration=None):
+    input_options = {"ac": 1}
+    if duration is not None:
+        input_options["t"] = duration
+    process = (
+        ffmpeg
+        .input("pipe:", **input_options)
+        .output("pipe:", format='wav',
+                acodec='pcm_s16le',
+                ar=target_ar,
+                ac=1)  # Select WAV output format, and pcm_s16le auidio codec.
+        .run_async(pipe_stdin=True, pipe_stdout=True)
+    )
+    audio_buffer = process.communicate(input=file.read())[0]
+    process.wait()
+    audio_io = BytesIO(audio_buffer)
+    return audio_io
+
+
 @st.cache_resource
 def feature_plot(key: Any):
     embeddings = st.session_state["model_history"][key]["embeddings"]

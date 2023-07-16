@@ -15,7 +15,6 @@ import torch
 from pytube.exceptions import RegexMatchError
 
 from torchaudio import load
-from torchaudio.transforms import Resample
 
 from src import utils
 
@@ -81,18 +80,21 @@ with left:
 wav = None
 thumbnail_url = None
 with right:
-    audio_file = st.file_uploader("uploader", label_visibility="collapsed")
+    audio_file = st.file_uploader("uploader", label_visibility="collapsed",
+                                  type=["mp3", "wav", "flac", "aac", "ogg"])
     url = st.text_input("Or paste a YouTube URL:")
+    print("URL sought:", url)
     if audio_file:
         # Load a file using torchaudio backend
         # will only support specific file formats
         try:
-            new_audio_io, err = utils.ffmpeg_reencode(audio_file, target_ar=str(SAMPLE_RATE), duration=st.session_state["max_duration"] )
+            new_audio_io = utils.ffmpeg_reencode_from_uploaded_file(audio_file, duration=st.session_state["max_duration"])
             wav, sr = load(new_audio_io)
-        except RuntimeError:
+        except RuntimeError as err:
             st.error("There was an issue loading the file. The file format might not be supported by torchaudio "
                      "backend. Please refer to "
                      "[torchaudio backend documentation](https://pytorch.org/audio/stable/backend.html).")
+            raise err.with_traceback(err.__traceback__)
     elif url:
         try:
             yt_audio_io, err = utils.get_audio_stream_from_youtube(url)
