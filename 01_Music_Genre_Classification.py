@@ -103,6 +103,7 @@ with right:
             wav, sr = load(new_audio_io)
             try:
                 os.remove(down_file)
+                print("Deleted", down_file)
             except FileNotFoundError:
                 print("Did not find", down_file, "to delete it.")
             except Exception as err:
