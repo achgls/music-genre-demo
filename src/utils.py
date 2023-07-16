@@ -8,7 +8,6 @@ import streamlit as st
 
 import torch
 import yt_dlp
-from pytube import YouTube
 
 import plotly.express as px
 
@@ -168,25 +167,6 @@ def download_stream_from_youtube(url: str, out_path: str = "temp", shared_filena
 
     down_file = os.listdir(out_path)[0]
     return os.path.join(out_path, down_file)
-
-
-def get_audio_stream_from_youtube(url: str, target_ar: str = '22050', duration=None):
-    yt = YouTube(url)
-
-    stream_url = yt.streams.filter(only_audio=True).first().url  # Get the URL of the video stream
-    print("Stream download URL:", stream_url)
-
-    # Probe the audio streams (use it in case you need information like sample rate):
-    # probe = ffmpeg.probe(stream_url)
-    # audio_streams = next((stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
-    # sr = audio_streams['sample_rate']
-
-    # Read audio into memory buffer.
-    # Get the audio using stdout pipe of ffmpeg sub-process.
-    # The audio is transcoded to PCM codec in WAC container.
-    audio_io, err = ffmpeg_reencode(stream_url, target_ar, duration)
-
-    return audio_io, err
 
 
 def ffmpeg_reencode_from_uploaded_file(file, target_ar: str = '22050', duration=None):
