@@ -75,6 +75,7 @@ left, right = st.columns((1, 3))
 with left:
     st.markdown("#### Upload a song extract for our model to classify")
 
+st.session_state["yt_file"] = None
 wav = None
 thumbnail_url = None
 with right:
@@ -103,8 +104,9 @@ with right:
         new_audio_io, err = utils.ffmpeg_reencode(down_file, duration=st.session_state["max_duration"])
         wav, sr = load(new_audio_io)
         try:
-            os.remove(down_file)
-            print("Deleted", down_file)
+            os.remove(st.session_state["yt_file"])
+            print("Deleted previous YouTube file:", st.session_state["yt_file"])
+            st.session_state["yt_file"] = down_file
         except FileNotFoundError:
             print("Did not find", down_file, "to delete it.")
         except Exception as err:
