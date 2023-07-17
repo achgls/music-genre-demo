@@ -87,6 +87,7 @@ with right:
         # Load a file using torchaudio backend
         # will only support specific file formats
         try:
+            song_name = audio_file.name
             wav, sr = load(audio_file)
             wav = Resample(orig_freq=sr, new_freq=SAMPLE_RATE)(wav)
             print("wav_mean:", torch.mean(wav))
@@ -96,7 +97,8 @@ with right:
                      "[torchaudio backend documentation](https://pytorch.org/audio/stable/backend.html).")
     elif url:
         try:
-            wav, sr = load(utils.get_audio_stream_from_youtube(url))
+            audio_io, song_name = utils.get_audio_stream_from_youtube(url)
+            wav, sr = load(audio_io)
         except RegexMatchError:
             st.error("Could not resolve the specified URL.")
         except Exception as err:
@@ -108,6 +110,7 @@ with right:
 if wav is not None:
     st.divider()
     st.markdown("")
+    st.write('Song name:', song_name)
 
     # --- Load pre-trained model and its associated transform (power-spectrogram) ---
     model, transform = utils.load_model_and_transform(MODEL_DIR, checkpoint="accuracy", model_type="CNN")
