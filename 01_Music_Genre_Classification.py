@@ -50,7 +50,7 @@ trues = st.cache_data(joblib.load)(os.path.join(MODEL_DIR, "training_labels.pkl"
 with st.sidebar:
     st.session_state["max_duration"] = st.number_input("Max duration in seconds", value=60, step=10, max_value=600)
     st.info("Maximum duration (in seconds) that the model will process.")
-    st.session_state["slice_duration"] = st.number_input("Duration of slices", value=2.0, step=0.5, max_value=10.0)
+    st.session_state["slice_duration"] = st.number_input("Duration of slices", value=4.0, step=0.5, max_value=10.0)
     st.info("Duration of each individual slice extracted from the audio.")
     st.session_state["overlap"] = st.slider("Overlap", value=0.5, step=0.05, max_value=1.0)
     st.info("The fraction of overlap between each contigous slice.")
@@ -80,7 +80,7 @@ wav = None
 thumbnail_url = None
 with right:
     audio_file = st.file_uploader("uploader", label_visibility="collapsed",
-                                  type=["mp3", "wav", "flac", "aac", "ogg"])
+                                  type=["mp3", "mp4", "wav", "flac", "aac", "ogg", "m4a"])
     url = st.text_input("Or paste a YouTube URL:")
     print("URL sought:", url)
     if audio_file:
@@ -96,23 +96,23 @@ with right:
             raise err.with_traceback(err.__traceback__)
     elif url:
         try:
+            os.remove(st.session_state["yt_file"])
+            print("Deleted previous YouTube file:", st.session_state["yt_file"])
+        except FileNotFoundError:
+            print("Did not find", st.session_state["yt_file"], "to delete it.")
+        except Exception as err:
+            print(f"Encountered {err.__class__.__name__} when trying to delete {st.session_state['yt_file']}.")
+            print("Here's the traceback:")
+            print(err.__traceback__)
+        try:
             down_file = utils.download_stream_from_youtube(url)
+            st.session_state["yt_file"] = down_file
         except Exception as err:
             st.error(f"**ERROR**: Encountered `{err.__class__.__name__}`")
             raise err.with_traceback(err.__traceback__)
         print("Downloaded YouTube audio stream to", down_file)
         new_audio_io, err = utils.ffmpeg_reencode(down_file, duration=st.session_state["max_duration"])
         wav, sr = load(new_audio_io)
-        try:
-            os.remove(st.session_state["yt_file"])
-            print("Deleted previous YouTube file:", st.session_state["yt_file"])
-            st.session_state["yt_file"] = down_file
-        except FileNotFoundError:
-            print("Did not find", down_file, "to delete it.")
-        except Exception as err:
-            print(f"Encountered {err.__class__.__name__} when trying to delete {down_file}.")
-            print("Here's the traceback:")
-            print(err.__traceback__)
 
 # ------ IF AUDIO -------
 

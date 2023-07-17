@@ -166,6 +166,7 @@ def download_stream_from_youtube(url: str, out_path: str = "temp", shared_filena
         error_code = ydl.download(url)
 
     down_file = os.listdir(out_path)[0]
+    ydl.cache.remove()
     return os.path.join(out_path, down_file)
 
 
