@@ -75,7 +75,6 @@ left, right = st.columns((1, 3))
 with left:
     st.markdown("#### Upload a song extract for our model to classify")
 
-st.session_state["yt_file"] = None
 wav = None
 thumbnail_url = None
 with right:
@@ -96,23 +95,16 @@ with right:
             raise err.with_traceback(err.__traceback__)
     elif url:
         try:
-            os.remove(st.session_state["yt_file"])
-            print("Deleted previous YouTube file:", st.session_state["yt_file"])
-        except FileNotFoundError:
-            print("Did not find", st.session_state["yt_file"], "to delete it.")
-        except Exception as err:
-            print(f"Encountered {err.__class__.__name__} when trying to delete {st.session_state['yt_file']}.")
-            print("Here's the traceback:")
-            print(err.__traceback__)
-        try:
+            for f in os.listdir("temp"):
+                os.remove(os.path.join("temp", f))
             down_file = utils.download_stream_from_youtube(url)
-            st.session_state["yt_file"] = down_file
+            print("Downloaded YouTube audio stream to", down_file)
+            new_audio_io, err = utils.ffmpeg_reencode(down_file, duration=st.session_state["max_duration"])
+            wav, sr = load(new_audio_io)
         except Exception as err:
             st.error(f"**ERROR**: Encountered `{err.__class__.__name__}`")
             raise err.with_traceback(err.__traceback__)
-        print("Downloaded YouTube audio stream to", down_file)
-        new_audio_io, err = utils.ffmpeg_reencode(down_file, duration=st.session_state["max_duration"])
-        wav, sr = load(new_audio_io)
+
 
 # ------ IF AUDIO -------
 

@@ -1,5 +1,6 @@
 import json
 import os.path
+from glob import glob
 from io import BytesIO
 from typing import Any
 
@@ -163,11 +164,13 @@ def download_stream_from_youtube(url: str, out_path: str = "temp", shared_filena
         'paths': {"home": out_path}
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
         error_code = ydl.download(url)
+        ydl.cache.remove()
 
-    down_file = os.listdir(out_path)[0]
-    ydl.cache.remove()
-    return os.path.join(out_path, down_file)
+    print("title:", info["title"])
+    down_file = glob(os.path.join(out_path, f"*{info['title']}*"))[0]
+    return down_file
 
 
 def ffmpeg_reencode_from_uploaded_file(file, target_ar: str = '22050', duration=None):
