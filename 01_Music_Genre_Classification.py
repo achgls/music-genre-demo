@@ -75,6 +75,11 @@ left, right = st.columns((1, 3))
 with left:
     st.markdown("#### Upload a song extract for our model to classify")
 
+try:
+    os.mkdir("temp")
+except FileExistsError:
+    pass
+
 wav = None
 thumbnail_url = None
 with right:
