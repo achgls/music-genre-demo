@@ -167,6 +167,7 @@ def wav_tensor_from_stream(s):
 
 def get_audio_stream_from_youtube(url: str):
     yt = YouTube(url)
+    song_name = yt.streams[0].default_filename #yt.author + '-' + yt.title
 
     stream_url = yt.streams.filter(only_audio=True).first().url  # Get the URL of the video stream
 
@@ -180,7 +181,7 @@ def get_audio_stream_from_youtube(url: str):
     # The audio is transcoded to PCM codec in WAC container.
     audio_io, err = ffmpeg_reencode_from_file(stream_url, target_ar='22050')
 
-    return audio_io
+    return audio_io, song_name
 
 
 @st.cache_resource
