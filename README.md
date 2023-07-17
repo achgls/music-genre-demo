@@ -1,7 +1,7 @@
 # Automatic music genre classification with Deep Learning
 ## A streamlit demo
 
-This repo contains the code for a streamlit-based demo of our project on Deep Learning
+This repo contains the code for a streamlit-based demo of our project ([main repo](https://github.com/achgls/music-genre-classification)) on Deep Learning
 for music genre classification as part of the Numerical Analysis for Machine Learning course at
 *Politecnico di Milano*, A.Y 2022-2023.
 
@@ -10,7 +10,12 @@ Usage
 -----
 The demo consists of a streamlit app that allows you to upload a local audio file
 (with supported formats those of `torchaudio.load(...)`)
-or paste a **YouTube** URL for the model to infer the music genre.
+or paste a **YouTube** URL for the model to infer the music genre. In order to use the app you need to run the following command 
+```console
+streamlit run 01_Music_Genre_Classification.py
+```
+or `python -m streamlit run 01_Music_Genre_Classification.py`.
+
 
 Once you input an audio, you will be able to hear it back and observe
 its spectrogram representation.
@@ -30,7 +35,7 @@ as black dots.
 Requirements
 ------------
 ```console
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 In addition to the libraries listed in `requirements.txt`, you will need to have `FFmpeg`
 installed on your machine with the CLI commands accessible from the environment where the 
