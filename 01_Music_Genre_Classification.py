@@ -23,7 +23,7 @@ st.set_page_config(
     page_title="NAML - Music Genre Classifcation 🎼",
     page_icon="🎼"
 )
-st.set_option('deprecation.showPyplotGlobalUse', False)
+# st.set_option('deprecation.showPyplotGlobalUse', False)
 
 plt.set_cmap("Greys")  # Set cmap for spectrogram
 color_palette = sns.color_palette("Set3", n_colors=10)
